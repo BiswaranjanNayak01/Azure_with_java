@@ -1,0 +1,5 @@
+$global:DefaultHost = "https://<your-instance>.azuredatabricks.net"
+$global:DefaultToken = "dapiXXXXXXXXXXXXXXXXXXXXXXXX"
+$global:DefaultClusterId = "<your-cluster-id>"
+$global:DefaultNotebookPath = "/Users/your.email@databricks.com/sql_query"
+$global:DefaultJobName = "PowerShell SQL Notebook Job"
