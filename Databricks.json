@@ -1,0 +1,165 @@
+{
+  "info": {
+    "name": "Databricks Notebook Automation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "databricks-notebook-automation"
+  },
+  "item": [
+    {
+      "name": "1. Import Notebook",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{DATABRICKS_TOKEN}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"path\": \"{{NOTEBOOK_PATH}}\",\n  \"language\": \"SQL\",\n  \"format\": \"SOURCE\",\n  \"content\": \"U0VMRUNUICogRlJPTSBkZW1vX3RhYmxlIExJTUlUIDEwOw==\"\n}"
+        },
+        "url": {
+          "raw": "{{DATABRICKS_HOST}}/api/2.0/workspace/import",
+          "host": ["{{DATABRICKS_HOST}}"],
+          "path": ["api", "2.0", "workspace", "import"]
+        }
+      }
+    },
+    {
+      "name": "2. Create Job",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const jsonData = pm.response.json();",
+              "pm.environment.set(\"JOB_ID\", jsonData.job_id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{DATABRICKS_TOKEN}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"SQL Notebook Job\",\n  \"existing_cluster_id\": \"{{CLUSTER_ID}}\",\n  \"notebook_task\": {\n    \"notebook_path\": \"{{NOTEBOOK_PATH}}\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{DATABRICKS_HOST}}/api/2.1/jobs/create",
+          "host": ["{{DATABRICKS_HOST}}"],
+          "path": ["api", "2.1", "jobs", "create"]
+        }
+      }
+    },
+    {
+      "name": "3. Run Job",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const jsonData = pm.response.json();",
+              "pm.environment.set(\"RUN_ID\", jsonData.run_id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{DATABRICKS_TOKEN}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"job_id\": {{JOB_ID}}\n}"
+        },
+        "url": {
+          "raw": "{{DATABRICKS_HOST}}/api/2.1/jobs/run-now",
+          "host": ["{{DATABRICKS_HOST}}"],
+          "path": ["api", "2.1", "jobs", "run-now"]
+        }
+      }
+    },
+    {
+      "name": "4. Get Run Output",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{DATABRICKS_TOKEN}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{DATABRICKS_HOST}}/api/2.1/jobs/runs/get-output?run_id={{RUN_ID}}",
+          "host": ["{{DATABRICKS_HOST}}"],
+          "path": ["api", "2.1", "jobs", "runs", "get-output"],
+          "query": [
+            {
+              "key": "run_id",
+              "value": "{{RUN_ID}}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "key": "DATABRICKS_HOST",
+      "value": ""
+    },
+    {
+      "key": "DATABRICKS_TOKEN",
+      "value": ""
+    },
+    {
+      "key": "CLUSTER_ID",
+      "value": ""
+    },
+    {
+      "key": "NOTEBOOK_PATH",
+      "value": "/Users/your.email@databricks.com/sample_sql_notebook"
+    },
+    {
+      "key": "JOB_ID",
+      "value": ""
+    },
+    {
+      "key": "RUN_ID",
+      "value": ""
+    }
+  ]
+}
